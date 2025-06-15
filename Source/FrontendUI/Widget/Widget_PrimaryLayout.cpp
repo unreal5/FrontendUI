@@ -2,7 +2,7 @@
 
 
 #include "Widget_PrimaryLayout.h"
-
+#include "FrontendDebugHelper.h"
 UCommonActivatableWidgetContainerBase* UWidget_PrimaryLayout::FindWidgetStackByTag(const FGameplayTag& InStackTag) const
 {
 	checkf(RegisteredWidgetStackMap.Contains(InStackTag), TEXT("Can not find widget stack with tag %s"), *InStackTag.ToString());
@@ -16,6 +16,8 @@ void UWidget_PrimaryLayout::RegisterWidgetStack(FGameplayTag InStackTag, UCommon
 		if (!RegisteredWidgetStackMap.Contains(InStackTag))
 		{
 			RegisteredWidgetStackMap.Add(InStackTag, InStack);
+
+			// DEBUG::Print(FString::Printf(TEXT("Registered widget stack with tag %s"), *InStackTag.ToString()), -1, FColor::Green);
 		}
 	}
 }
