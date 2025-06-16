@@ -40,30 +40,26 @@ void UFrontendUISubsystem::PushSoftWidgetToStackAsync(const FGameplayTag& InWidg
 {
 	check(!InSoftWidgetClass.IsNull());
 
-	UAssetManager::Get().GetStreamableManager().RequestAsyncLoad(InSoftWidgetClass.ToSoftObjectPath(),
-	                                                             FStreamableDelegate::CreateLambda(
-		                                                             [this, InWidgetStackTag, InSoftWidgetClass,
-			                                                             AsyncPushCallback]()
-		                                                             {
-			                                                             UClass* LoadedWidgetClass = InSoftWidgetClass.
-				                                                             Get();
-			                                                             check(LoadedWidgetClass);
+	UAssetManager::Get()
+		.GetStreamableManager()
+		.RequestAsyncLoad(InSoftWidgetClass.ToSoftObjectPath(), FStreamableDelegate::CreateLambda(
+			                  [this, InWidgetStackTag, InSoftWidgetClass,
+				                  AsyncPushCallback]()
+			                  {
+				                  UClass* LoadedWidgetClass = InSoftWidgetClass.Get();
+				                  check(LoadedWidgetClass);
 
-			                                                             UCommonActivatableWidgetContainerBase*
-				                                                             FoundWidgetStack = CreatedPrimaryLayout->
-				                                                             FindWidgetStackByTag(InWidgetStackTag);
-			                                                             UWidget_ActivatableBase* CreatedWidget =
-				                                                             FoundWidgetStack->AddWidget<
-					                                                             UWidget_ActivatableBase>(
-					                                                             LoadedWidgetClass,
-					                                                             [AsyncPushCallback](
-					                                                             UWidget_ActivatableBase&
-					                                                             CreatedWidgetInstance)
-					                                                             {
-						                                                             AsyncPushCallback(
-							                                                             EAsyncPushWidgetState::OnCreatedBeforePush,
-							                                                             &CreatedWidgetInstance);
-					                                                             });
-		                                                             	AsyncPushCallback(EAsyncPushWidgetState::AfterPush, CreatedWidget);
-		                                                             }));
+				                  UCommonActivatableWidgetContainerBase* FoundWidgetStack = CreatedPrimaryLayout->
+					                  FindWidgetStackByTag(InWidgetStackTag);
+
+				                  UWidget_ActivatableBase* CreatedWidget = FoundWidgetStack->AddWidget<
+					                  UWidget_ActivatableBase>(
+					                  LoadedWidgetClass,
+					                  [AsyncPushCallback](UWidget_ActivatableBase& CreatedWidgetInstance)
+					                  {
+						                  AsyncPushCallback(EAsyncPushWidgetState::OnCreatedBeforePush,
+						                                    &CreatedWidgetInstance);
+					                  });
+				                  AsyncPushCallback(EAsyncPushWidgetState::AfterPush, CreatedWidget);
+			                  }));
 }
